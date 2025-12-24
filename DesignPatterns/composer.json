@@ -1,0 +1,12 @@
+{
+    "name": "nick/design-patterns",
+    "authors": [
+        {
+            "name": "Nick",
+            "email": "elanir358@gmail.com"
+        }
+    ],
+    "require": {
+        "twig/twig": "^3.22"
+    }
+}

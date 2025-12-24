@@ -8,23 +8,17 @@ use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
 /**
- * The Abstract Factory interface declares creation methods for each distinct
- * product type.
+ * Abstract Factory
  */
 interface TemplateFactory
 {
     public function createTitleTemplate(): TitleTemplate;
-
     public function createPageTemplate(): PageTemplate;
-
     public function getRenderer(): TemplateRenderer;
 }
 
 /**
- * Each Concrete Factory corresponds to a specific variant (or family) of
- * products.
- *
- * This Concrete Factory creates Twig templates.
+ * Concrete Factory for Twig
  */
 class TwigTemplateFactory implements TemplateFactory
 {
@@ -45,7 +39,7 @@ class TwigTemplateFactory implements TemplateFactory
 }
 
 /**
- * And this Concrete Factory creates PHPTemplate templates.
+ * Concrete Factory for PHPTemplate
  */
 class PHPTemplateFactory implements TemplateFactory
 {
@@ -66,11 +60,7 @@ class PHPTemplateFactory implements TemplateFactory
 }
 
 /**
- * Each distinct product type should have a separate interface. All variants of
- * the product must follow the same interface.
- *
- * For instance, this Abstract Product interface describes the behavior of page
- * title templates.
+ * Abstract Product: Title Template
  */
 interface TitleTemplate
 {
@@ -78,7 +68,7 @@ interface TitleTemplate
 }
 
 /**
- * This Concrete Product provides Twig page title templates.
+ * Twig Title Template
  */
 class TwigTitleTemplate implements TitleTemplate
 {
@@ -89,7 +79,7 @@ class TwigTitleTemplate implements TitleTemplate
 }
 
 /**
- * And this Concrete Product provides PHPTemplate page title templates.
+ * PHPTemplate Title Template
  */
 class PHPTemplateTitleTemplate implements TitleTemplate
 {
@@ -100,7 +90,7 @@ class PHPTemplateTitleTemplate implements TitleTemplate
 }
 
 /**
- * This is another Abstract Product type, which describes whole page templates.
+ * Abstract Product: Page Template
  */
 interface PageTemplate
 {
@@ -108,13 +98,11 @@ interface PageTemplate
 }
 
 /**
- * The page template uses the title sub-template, so we have to provide the way
- * to set it in the sub-template object. The abstract factory will link the page
- * template with a title template of the same variant.
+ * Base Page Template
  */
 abstract class BasePageTemplate implements PageTemplate
 {
-    protected $titleTemplate;
+    protected TitleTemplate $titleTemplate;
 
     public function __construct(TitleTemplate $titleTemplate)
     {
@@ -123,7 +111,7 @@ abstract class BasePageTemplate implements PageTemplate
 }
 
 /**
- * The Twig variant of the whole page templates.
+ * Twig Page Template
  */
 class TwigPageTemplate extends BasePageTemplate
 {
@@ -132,16 +120,16 @@ class TwigPageTemplate extends BasePageTemplate
         $renderedTitle = $this->titleTemplate->getTemplateString();
 
         return <<<HTML
-        <div class="page">
-            $renderedTitle
-            <article class="content">{{ content }}</article>
-        </div>
-        HTML;
+<div class="page">
+    $renderedTitle
+    <article class="content">{{ content }}</article>
+</div>
+HTML;
     }
 }
 
 /**
- * The PHPTemplate variant of the whole page templates.
+ * PHPTemplate Page Template
  */
 class PHPTemplatePageTemplate extends BasePageTemplate
 {
@@ -150,19 +138,16 @@ class PHPTemplatePageTemplate extends BasePageTemplate
         $renderedTitle = $this->titleTemplate->getTemplateString();
 
         return <<<HTML
-        <div class="page">
-            $renderedTitle
-            <article class="content"><?= \$content; ?></article>
-        </div>
-        HTML;
+<div class="page">
+    $renderedTitle
+    <article class="content"><?= \$content; ?></article>
+</div>
+HTML;
     }
 }
 
 /**
- * The renderer is responsible for converting a template string into the actual
- * HTML code. Each renderer behaves differently and expects its own type of
- * template strings passed to it. Baking templates with the factory let you pass
- * proper types of templates to proper renders.
+ * Abstract Renderer
  */
 interface TemplateRenderer
 {
@@ -170,7 +155,7 @@ interface TemplateRenderer
 }
 
 /**
- * The renderer for Twig templates.
+ * Twig Renderer
  */
 class TwigRenderer implements TemplateRenderer
 {
@@ -178,60 +163,50 @@ class TwigRenderer implements TemplateRenderer
 
     public function __construct()
     {
-        // Initialize Twig with the empty loader
+        // Инициализируем Twig с пустым loader
         $this->twig = new Environment(new ArrayLoader([]));
     }
 
     public function render(string $templateString, array $arguments = []): string
     {
-        // Use the ArrayLoader, to render the string
+        // Используем ArrayLoader, чтобы рендерить строку
         $this->twig->setLoader(new ArrayLoader(['tpl' => $templateString]));
         return $this->twig->render('tpl', $arguments);
     }
 }
 
 /**
- * The renderer for PHPTemplate templates. Note that this implementation is very
- * basic, if not crude. Using the `eval` function has many security
- * implications, so use it with caution in real projects.
+ * PHPTemplate Renderer
  */
 class PHPTemplateRenderer implements TemplateRenderer
 {
     public function render(string $templateString, array $arguments = []): string
     {
         extract($arguments);
-
         ob_start();
         eval(' ?>' . $templateString . '<?php ');
-        $result = ob_get_contents();
-        ob_end_clean();
-
+        $result = ob_get_clean();
         return $result;
     }
 }
 
 /**
- * The client code. Note that it accepts the Abstract Factory class as the
- * parameter, which allows the client to work with any concrete factory type.
+ * Client
  */
 class Page
 {
-    public $title;
+    public string $title;
+    public string $content;
 
-    public $content;
-
-    public function __construct($title, $content)
+    public function __construct(string $title, string $content)
     {
         $this->title = $title;
         $this->content = $content;
     }
 
-    // Here's how would you use the template further in real life. Note that the
-    // page class does not depend on any concrete template classes.
     public function render(TemplateFactory $factory): string
     {
         $pageTemplate = $factory->createPageTemplate();
-
         $renderer = $factory->getRenderer();
 
         return $renderer->render($pageTemplate->getTemplateString(), [
@@ -242,16 +217,15 @@ class Page
 }
 
 /**
- * Now, in other parts of the app, the client code can accept factory objects of
- * any type.
+ * Example usage
  */
 $page = new Page('Sample page', 'This is the body.');
 
-echo "Testing actual rendering with the PHPTemplate factory:\n";
+// PHPTemplate rendering
+echo "=== PHPTemplate Output ===\n";
 echo $page->render(new PHPTemplateFactory());
 echo "\n\n";
 
-// Uncomment the following if you have Twig installed.
-
-echo "Testing rendering with the Twig factory:\n";
+// Twig rendering
+echo "=== Twig Output ===\n";
 echo $page->render(new TwigTemplateFactory());
