@@ -1,0 +1,4 @@
+name,age,owner,breed,image,color,texture,fur,size
+Steve,3,John Smith,Bengal,/cats/bengal.jpg,Brown,Spotted,Short,Medium
+Siri,2,Alexander Shvets,Domestic short-haired,/cats/domestic-sh.jpg,Black,Solid,Short,Small
+Fluffy,5,Mary Johnson,Maine Coon,/cats/maine-coon.jpg,Gray,Striped,Long,Large
