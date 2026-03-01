@@ -1,0 +1,2 @@
+active,address.city,address.country,address.geo.lat,address.geo.lng,address.zip,age,contacts.email,contacts.phones.0,contacts.phones.1,id,name,skills.0.level,skills.0.name,skills.1.level,skills.1.name
+true,Lviv,Ukraine,49.8397,24.0297,79000,28,nick@example.com,+380111111111,+380222222222,1001,Nick,advanced,PHP,intermediate,Haskell

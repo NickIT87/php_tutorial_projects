@@ -1,0 +1,34 @@
+[
+    {
+        "active": "true",
+        "address": {
+            "city": "Lviv",
+            "country": "Ukraine",
+            "geo": {
+                "lat": "49.8397",
+                "lng": "24.0297"
+            },
+            "zip": "79000"
+        },
+        "age": "28",
+        "contacts": {
+            "email": "nick@example.com",
+            "phones": [
+                "+380111111111",
+                "+380222222222"
+            ]
+        },
+        "id": "1001",
+        "name": "Nick",
+        "skills": [
+            {
+                "level": "advanced",
+                "name": "PHP"
+            },
+            {
+                "level": "intermediate",
+                "name": "Haskell"
+            }
+        ]
+    }
+]
